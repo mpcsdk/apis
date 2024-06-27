@@ -121,11 +121,11 @@ func New() *sDB {
 	///
 	return &sDB{
 		r:             r,
-		dur:           conf.Config.Cache.SessionDuration,
+		dur:           conf.Config.Cache.Duration,
 		chainTransfer: map[int64]*mpcdao.ChainTransfer{},
 		//mapmpcdao.NewChainTransfer(r, conf.Config.Cache.SessionDuration),
-		riskCtrlRule: mpcdao.NewRiskCtrlRule(r, conf.Config.Cache.SessionDuration),
-		chainCfg:     mpcdao.NewChainCfg(r, conf.Config.Cache.SessionDuration),
+		riskCtrlRule: mpcdao.NewRiskCtrlRule(r, conf.Config.Cache.Duration),
+		chainCfg:     mpcdao.NewChainCfg(r, conf.Config.Cache.Duration),
 	}
 }
 func init() {

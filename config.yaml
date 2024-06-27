@@ -16,9 +16,13 @@ database:
     - link: "pgsql:postgres:123456@tcp(localhost:10100)/sync_chain"
   riskcontrol:
     - link: "mysql:ssh:123456@tcp(localhost:3305)/riskcontrol"
-
+  enhanced_riskctrl:
+  - link: "pgsql:postgres:123456@tcp(127.0.0.1:10100)/enhanced_riskctrl"
+    role: "master"
+  - link: "pgsql:postgres:123456@tcp(127.0.0.1:10100)/enhanced_riskctrl"
+    role: "slave"
 cache:
-  sessionDuration: 2000
+  duration: 2000
 
 nrpc:
   natsUrl: "127.0.0.1:4222"
@@ -32,3 +36,6 @@ redis:
   cache:
     address:     127.0.0.1:10060
     db:          2
+  aggTx:
+    address: 127.0.0.1:6379
+    db:      11

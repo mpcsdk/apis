@@ -8,7 +8,7 @@ import (
 )
 
 type Cache struct {
-	SessionDuration int `json:"sessionDuration" v:"required|min:100"`
+	Duration int `json:"duration" v:"required|min:100"`
 }
 
 type Server struct {

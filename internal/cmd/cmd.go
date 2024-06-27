@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"apis/internal/controller/chaindata"
+	"apis/internal/controller/enhanced"
 	"context"
 
 	"github.com/gogf/gf/v2/errors/gcode"
@@ -80,9 +81,12 @@ var (
 				group.Middleware(MiddlewareErrorHandler)
 				group.Middleware(MiddlewareCORS)
 				group.Middleware(ResponseHandler)
-				group.Bind(
-					chaindata.NewV1(),
-				)
+				group.Group("/chaindata", func(group *ghttp.RouterGroup) {
+					group.Bind(chaindata.NewV1())
+				})
+				group.Group("/enhanced", func(group *ghttp.RouterGroup) {
+					group.Bind(enhanced.NewV1())
+				})
 			})
 			s.Run()
 			return nil

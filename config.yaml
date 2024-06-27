@@ -1,0 +1,34 @@
+server:
+  name: "apis"
+  address:     ":8999"
+  workId: 1
+  openapiPath: "/api.json"
+  swaggerPath: "/swagger"
+
+logger:
+  level : "info"
+  stdout: true 
+  rotateExpire: "1d"
+  path: "./"
+
+database:
+  sync_chain:
+    - link: "pgsql:postgres:123456@tcp(localhost:10100)/sync_chain"
+  riskcontrol:
+    - link: "mysql:ssh:123456@tcp(localhost:3305)/riskcontrol"
+
+cache:
+  sessionDuration: 2000
+
+nrpc:
+  natsUrl: "127.0.0.1:4222"
+
+
+# redis 
+redis:
+  default:
+    address: 127.0.0.1:10060
+    db:      1
+  cache:
+    address:     127.0.0.1:10060
+    db:          2

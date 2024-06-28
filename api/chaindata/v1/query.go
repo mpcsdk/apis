@@ -14,7 +14,7 @@ type CountRes struct {
 
 // /
 type QueryReq struct {
-	g.Meta   `path:"/query" tags:"query" method:"post" summary:"You first hello api"`
+	g.Meta   `path:"/queryTransfer" tags:"query" method:"post" summary:"You first hello api"`
 	ChainId  int64  `json:"chainId"`
 	From     string `json:"from"`
 	To       string `json:"to"`

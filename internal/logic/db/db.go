@@ -118,8 +118,9 @@ func New() *sDB {
 	if err != nil {
 		panic(err)
 	}
+
 	///
-	return &sDB{
+	s := &sDB{
 		r:             r,
 		dur:           conf.Config.Cache.Duration,
 		chainTransfer: map[int64]*mpcdao.ChainTransfer{},
@@ -127,6 +128,15 @@ func New() *sDB {
 		riskCtrlRule: mpcdao.NewRiskCtrlRule(r, conf.Config.Cache.Duration),
 		chainCfg:     mpcdao.NewChainCfg(r, conf.Config.Cache.Duration),
 	}
+	////chains cfg
+	cfgs, err := s.chainCfg.AllCfg(gctx.GetInitCtx())
+	if err != nil {
+		panic(err)
+	}
+	for _, cfg := range cfgs {
+		s.InitChainTransferDB(gctx.GetInitCtx(), cfg.ChainId)
+	}
+	return s
 }
 func init() {
 

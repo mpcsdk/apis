@@ -23,7 +23,6 @@ database:
       role: "slave"
   sync_nft_holding:
     - link: "pgsql:postgres:123456@tcp(127.0.0.1:5432)/sync_nft_holding"
-      debug: true
 cache:
   duration: 2000
 

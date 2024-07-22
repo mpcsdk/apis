@@ -18,7 +18,7 @@ type ControllerV1 struct{
 }
 
 
-func NewV1() chaindata.IQueryV1 {
+func NewV1() chaindata.IChaindataV1{
 	s := &ControllerV1{
 		contracts: make(map[string]*entity.Contractabi),
 		chains: make(map[int64]*entity.Chaincfg),

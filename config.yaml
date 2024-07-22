@@ -1,41 +1,43 @@
 server:
   name: "apis"
-  address:     ":8999"
+  address: ":8999"
   workId: 1
   openapiPath: "/api.json"
   swaggerPath: "/swagger"
 
 logger:
-  level : "info"
-  stdout: true 
+  level: "info"
+  stdout: true
   rotateExpire: "1d"
   path: "./"
 
 database:
   sync_chain:
-    - link: "pgsql:postgres:123456@tcp(localhost:10100)/sync_chain"
+    - link: "pgsql:postgres:123456@tcp(localhost:5432)/sync_chain"
   riskcontrol:
-    - link: "mysql:ssh:123456@tcp(localhost:3305)/riskcontrol"
+    - link: "mysql:riskcontrol:123456@tcp(localhost:3306)/riskcontrol"
   enhanced_riskctrl:
-  - link: "pgsql:postgres:123456@tcp(127.0.0.1:10100)/enhanced_riskctrl"
-    role: "master"
-  - link: "pgsql:postgres:123456@tcp(127.0.0.1:10100)/enhanced_riskctrl"
-    role: "slave"
+    - link: "pgsql:postgres:123456@tcp(127.0.0.1:5432)/enhanced_riskctrl"
+      role: "master"
+    - link: "pgsql:postgres:123456@tcp(127.0.0.1:5432)/enhanced_riskctrl"
+      role: "slave"
+  sync_nft_holding:
+    - link: "pgsql:postgres:123456@tcp(127.0.0.1:5432)/sync_nft_holding"
+      debug: true
 cache:
   duration: 2000
 
 nrpc:
   natsUrl: "127.0.0.1:4222"
 
-
-# redis 
+# redis
 redis:
   default:
     address: 127.0.0.1:10060
-    db:      1
+    db: 1
   cache:
-    address:     127.0.0.1:10060
-    db:          2
+    address: 127.0.0.1:10060
+    db: 2
   aggTx:
     address: 127.0.0.1:6379
-    db:      11
+    db: 11

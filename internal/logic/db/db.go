@@ -134,7 +134,10 @@ func New() *sDB {
 		panic(err)
 	}
 	for _, cfg := range cfgs {
-		s.InitChainTransferDB(gctx.GetInitCtx(), cfg.ChainId)
+		err = s.InitChainTransferDB(gctx.GetInitCtx(), cfg.ChainId)
+		if err != nil {
+			panic(err)
+		}
 	}
 	return s
 }

@@ -5,11 +5,12 @@ import (
 )
 
 type NftHoldingReq struct {
-	g.Meta   `path:"/nftHolding" tags:"nftHoldingReq" method:"post" summary:"You first hello api"`
-	ChainId  int64  `json:"chainId"`
-	Address  string `json:"address"`
-	Contract string `json:"contract"`
-	Kind     string `json:"kind"`
+	g.Meta         `path:"/nftHolding" tags:"nftHoldingReq" method:"post" summary:"You first hello api"`
+	ChainId        int64  `json:"chainId"`
+	Address        string `json:"address"`
+	Contract       string `json:"contract"`
+	CollectionName string `json:"collectionName"`
+	Kind           string `json:"kind"`
 	///
 	Page     int64 `json:"page"`
 	PageSize int64 `json:"pageSize"`

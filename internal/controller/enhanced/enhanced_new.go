@@ -20,17 +20,18 @@ import (
 var bigZero = big.NewInt(0)
 
 type ControllerV1 struct {
-	redis     *gredis.Redis
-	contracts map[string]*entity.Contractabi
-	//
+	redis           *gredis.Redis
+	contracts       map[string]*entity.Contractabi
+	collectionNames map[string][]*entity.Contractabi
+	//db
 	enhanced_riskctrl *mpcdao.EnhancedRiskCtrl
-	///
-	nftHolding *mpcdao.NftHolding
+	nftHolding        *mpcdao.NftHolding
 }
 
 func NewV1() enhanced.IEnhancedV1 {
 	s := &ControllerV1{
-		contracts: make(map[string]*entity.Contractabi),
+		contracts:       make(map[string]*entity.Contractabi),
+		collectionNames: map[string][]*entity.Contractabi{},
 	}
 	///
 	ctx := gctx.GetInitCtx()
@@ -40,6 +41,11 @@ func NewV1() enhanced.IEnhancedV1 {
 	}
 	for _, c := range contracts {
 		s.contracts[c.ContractAddress] = c
+		if _, ok := s.collectionNames[c.ContractName]; ok {
+			s.collectionNames[c.ContractName] = append(s.collectionNames[c.ContractName], c)
+		} else {
+			s.collectionNames[c.ContractName] = []*entity.Contractabi{c}
+		}
 	}
 	///
 	r := g.Redis("aggTx")
@@ -51,5 +57,6 @@ func NewV1() enhanced.IEnhancedV1 {
 	s.enhanced_riskctrl = mpcdao.NewEnhancedRiskCtrl(r, conf.Config.Cache.Duration)
 	s.nftHolding = mpcdao.NewNftHolding()
 	s.redis = r
+
 	return s
 }

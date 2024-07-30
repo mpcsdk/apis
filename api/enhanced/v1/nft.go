@@ -30,3 +30,20 @@ type NftHoldingRes struct {
 	g.Meta `mime:"text/html" example:"string"`
 	Result []*NftHolding `json:"result"`
 }
+
+// /////
+// ////
+type NftHoldingCountReq struct {
+	g.Meta  `path:"/nftHoldingCount" tags:"nftHoldingCountReq" method:"post" summary:"You first hello api"`
+	ChainId int64  `json:"chainId"`
+	Address string `json:"address"`
+	//
+}
+type NftHoldingCount struct {
+	Symbol string `json:"symbol"`
+	Value  int64  `json:"value"`
+}
+type NftHoldingCountRes struct {
+	g.Meta `mime:"text/html" example:"string"`
+	Result []*NftHoldingCount `json:"result"`
+}

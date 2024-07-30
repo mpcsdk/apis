@@ -17,7 +17,7 @@ func (s *ControllerV1) NftHolding(ctx context.Context, req *v1.NftHoldingReq) (r
 		return nil, mpccode.CodeParamInvalid("pageSize")
 	}
 	if !common.IsHexAddress(req.Address) {
-		return nil, mpccode.CodeParamInvalid("chainId or address")
+		return nil, mpccode.CodeParamInvalid("address")
 	}
 	if req.Kind == "" {
 		return nil, mpccode.CodeParamInvalid("kind")

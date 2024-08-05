@@ -10,6 +10,7 @@ type NftHoldingReq struct {
 	Address        string `json:"address"`
 	Contract       string `json:"contract"`
 	CollectionName string `json:"collectionName"`
+	Collection     string `json:"collection"`
 	Kind           string `json:"kind"`
 	///
 	Page     int64 `json:"page"`

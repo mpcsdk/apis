@@ -12,9 +12,10 @@ type Cache struct {
 }
 
 type Server struct {
-	Address string `json:"address" v:"required"`
-	WorkId  int    `json:"workId" v:"required|min:1"`
-	Name    string `json:"name" v:"required"`
+	Address   string `json:"address" v:"required"`
+	WorkId    int    `json:"workId" v:"required|min:1"`
+	Name      string `json:"name" v:"required"`
+	RateLimit int    `json:"rateLimit" v:"required|min:1"`
 }
 type Nrpcfg struct {
 	NatsUrl string `json:"natsUrl" v:"required"`

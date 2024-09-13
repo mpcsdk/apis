@@ -3,6 +3,7 @@ package cmd
 import (
 	"apis/internal/controller/chaindata"
 	"apis/internal/controller/enhanced"
+	"apis/internal/service"
 	"context"
 
 	"github.com/gogf/gf/v2/errors/gcode"
@@ -10,9 +11,24 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcmd"
+	"github.com/mpcsdk/mpcCommon/mpccode"
 	"go.opentelemetry.io/otel/trace"
 )
 
+var apiLimit = mpccode.CodeApiLimit
+
+func RateLimit(r *ghttp.Request) {
+	if service.RateLimiter().Allow() {
+		r.Middleware.Next()
+	} else {
+		r.Response.WriteJson(ghttp.DefaultHandlerResponse{
+			Code:    100,
+			Message: "api limit",
+			Data:    nil,
+		})
+	}
+
+}
 func MiddlewareErrorHandler(r *ghttp.Request) {
 	r.Middleware.Next()
 	if err := r.GetError(); err != nil {
@@ -78,6 +94,7 @@ var (
 		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
 			s := g.Server()
 			s.Group("/", func(group *ghttp.RouterGroup) {
+				group.Middleware(RateLimit)
 				group.Middleware(MiddlewareErrorHandler)
 				group.Middleware(MiddlewareCORS)
 				group.Middleware(ResponseHandler)

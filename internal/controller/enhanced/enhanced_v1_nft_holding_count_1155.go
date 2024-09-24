@@ -19,10 +19,14 @@ func (s *ControllerV1) NftHoldingCount1155(ctx context.Context, req *v1.NftHoldi
 	if req.ChainId <= 0 {
 		return nil, mpccode.CodeParamInvalid("chainId")
 	}
+	if !common.IsHexAddress(req.Collection) {
+		return nil, mpccode.CodeParamInvalid("collection")
+	}
 	////
 	rsts, err := s.nftHolding.QueryCount(ctx, &mpcdao.QueryNftHolding{
-		ChainId: req.ChainId,
-		Address: common.HexToAddress(req.Address).String(),
+		ChainId:   req.ChainId,
+		Address:   common.HexToAddress(req.Address).String(),
+		Contracts: []string{common.HexToAddress(req.Collection).String()},
 	})
 	if err != nil {
 		g.Log().Warning(ctx, "NftHoldingCount1155:", "err:", err)

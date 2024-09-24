@@ -53,9 +53,10 @@ type NftHoldingCountRes struct {
 // //
 // // //NftHoldingCount1155
 type NftHoldingCount1155Req struct {
-	g.Meta  `path:"/nftHoldingCount1155" tags:"nftHoldingCount1155Req" method:"post" summary:"You first hello api"`
-	ChainId int64  `json:"chainId"`
-	Address string `json:"address"`
+	g.Meta     `path:"/nftHoldingCount1155" tags:"nftHoldingCount1155Req" method:"post" summary:"You first hello api"`
+	ChainId    int64  `json:"chainId"`
+	Address    string `json:"address"`
+	Collection string `json:"collection"`
 	//
 }
 type NftHolding1155Count struct {

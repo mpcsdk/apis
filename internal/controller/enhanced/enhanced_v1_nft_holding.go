@@ -22,12 +22,16 @@ func (s *ControllerV1) nftHoldingCollectionName(ctx context.Context, req *v1.Nft
 
 	////name to contracts
 	contracts := []string{}
-	if abis, ok := s.collectionNames[req.CollectionName]; !ok {
-		return nil, mpccode.CodeParamInvalid(req.CollectionName)
-	} else {
-		for _, abi := range abis {
-			contracts = append(contracts, abi.ContractAddress)
+	if req.Collection == "" {
+		if abis, ok := s.collectionNames[req.CollectionName]; !ok {
+			return nil, mpccode.CodeParamInvalid(req.CollectionName)
+		} else {
+			for _, abi := range abis {
+				contracts = append(contracts, abi.ContractAddress)
+			}
 		}
+	} else {
+		contracts = append(contracts, req.Collection)
 	}
 	g.Log().Debug(ctx, "NftHolding match collections:", contracts)
 	//////

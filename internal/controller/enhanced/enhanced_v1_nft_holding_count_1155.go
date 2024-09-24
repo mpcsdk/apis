@@ -39,7 +39,7 @@ func (s *ControllerV1) NftHoldingCount1155(ctx context.Context, req *v1.NftHoldi
 		if abi, ok := s.contracts[rst.Contract]; !ok {
 			return nil, mpccode.CodeParamInvalid(abi.ContractName)
 		} else {
-			if _, ok := aggCount[abi.ContractName]; !ok {
+			if _, ok := aggCount[abi.ContractAddress]; !ok {
 				aggCount[abi.ContractAddress] = &v1.NftHolding1155Count{
 					Symbol:     abi.ContractName,
 					Value:      rst.Value,

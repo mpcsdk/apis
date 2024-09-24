@@ -11,10 +11,13 @@ import (
 	"github.com/mpcsdk/mpcCommon/mpcdao"
 )
 
-func (s *ControllerV1) NftHoldingCount(ctx context.Context, req *v1.NftHoldingCountReq) (*v1.NftHoldingCountRes, error) {
-	g.Log().Debug(ctx, "NftHoldingCount:", "req:", req)
+func (s *ControllerV1) NftHoldingCount1155(ctx context.Context, req *v1.NftHoldingCount1155Req) (res *v1.NftHoldingCount1155Res, err error) {
+	g.Log().Debug(ctx, "NftHoldingCount1155:", "req:", req)
 	if !common.IsHexAddress(req.Address) {
 		return nil, mpccode.CodeParamInvalid("address")
+	}
+	if req.ChainId <= 0 {
+		return nil, mpccode.CodeParamInvalid("chainId")
 	}
 	////
 	rsts, err := s.nftHolding.QueryCount(ctx, &mpcdao.QueryNftHolding{
@@ -22,29 +25,30 @@ func (s *ControllerV1) NftHoldingCount(ctx context.Context, req *v1.NftHoldingCo
 		Address: common.HexToAddress(req.Address).String(),
 	})
 	if err != nil {
-		g.Log().Warning(ctx, "NftHoldingCount:", "err:", err)
+		g.Log().Warning(ctx, "NftHoldingCount1155:", "err:", err)
 		return nil, mpccode.CodeInternalError()
 	}
-	g.Log().Debug(ctx, "NftHoldingCount:", "rsts:", rsts)
+	g.Log().Debug(ctx, "NftHoldingCount1155:", "rsts:", rsts)
 	////
-	aggCount := map[string]*v1.NftHoldingCount{}
+	aggCount := map[string]*v1.NftHolding1155Count{}
 	for _, rst := range rsts {
 		if abi, ok := s.contracts[rst.Contract]; !ok {
 			return nil, mpccode.CodeParamInvalid(abi.ContractName)
 		} else {
 			if _, ok := aggCount[abi.ContractName]; !ok {
-				aggCount[abi.ContractName] = &v1.NftHoldingCount{
-					Symbol: abi.ContractName,
-					Value:  rst.Value,
+				aggCount[abi.ContractAddress] = &v1.NftHolding1155Count{
+					Symbol:     abi.ContractName,
+					Value:      rst.Value,
+					Collection: abi.ContractAddress,
 				}
 			} else {
-				aggCount[abi.ContractName].Value += rst.Value
+				aggCount[abi.ContractAddress].Value += rst.Value
 			}
 		}
 	}
 	//////
-	res := &v1.NftHoldingCountRes{
-		Result: []*v1.NftHoldingCount{},
+	res = &v1.NftHoldingCount1155Res{
+		Result: []*v1.NftHolding1155Count{},
 	}
 	for _, v := range aggCount {
 		res.Result = append(res.Result, v)

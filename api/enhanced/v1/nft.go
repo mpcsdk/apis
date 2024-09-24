@@ -41,11 +41,29 @@ type NftHoldingCountReq struct {
 	//
 }
 type NftHoldingCount struct {
-	Symbol     string `json:"symbol"`
-	Collection string `json:"collection"`
-	Value      int64  `json:"value"`
+	Symbol string `json:"symbol"`
+	Value  int64  `json:"value"`
 }
 type NftHoldingCountRes struct {
 	g.Meta `mime:"text/html" example:"string"`
 	Result []*NftHoldingCount `json:"result"`
+}
+
+// //
+// //
+// // //NftHoldingCount1155
+type NftHoldingCount1155Req struct {
+	g.Meta  `path:"/nftHoldingCount" tags:"nftHoldingCount1155Req" method:"post" summary:"You first hello api"`
+	ChainId int64  `json:"chainId"`
+	Address string `json:"address"`
+	//
+}
+type NftHolding1155Count struct {
+	Symbol     string `json:"symbol"`
+	Value      int64  `json:"value"`
+	Collection string `json:"collection"`
+}
+type NftHoldingCount1155Res struct {
+	g.Meta `mime:"text/html" example:"string"`
+	Result []*NftHolding1155Count `json:"result"`
 }

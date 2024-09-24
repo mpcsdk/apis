@@ -34,8 +34,9 @@ func (s *ControllerV1) NftHoldingCount(ctx context.Context, req *v1.NftHoldingCo
 		} else {
 			if _, ok := aggCount[abi.ContractName]; !ok {
 				aggCount[abi.ContractName] = &v1.NftHoldingCount{
-					Symbol: abi.ContractName,
-					Value:  rst.Value,
+					Symbol:     abi.ContractName,
+					Value:      rst.Value,
+					Collection: rst.Contract,
 				}
 			} else {
 				aggCount[abi.ContractName].Value += rst.Value

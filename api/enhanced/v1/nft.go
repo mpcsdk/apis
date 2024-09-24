@@ -41,8 +41,9 @@ type NftHoldingCountReq struct {
 	//
 }
 type NftHoldingCount struct {
-	Symbol string `json:"symbol"`
-	Value  int64  `json:"value"`
+	Symbol     string `json:"symbol"`
+	Collection string `json:"collection"`
+	Value      int64  `json:"value"`
 }
 type NftHoldingCountRes struct {
 	g.Meta `mime:"text/html" example:"string"`

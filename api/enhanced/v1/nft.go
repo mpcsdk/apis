@@ -60,7 +60,6 @@ type NftHoldingCount1155Req struct {
 	//
 }
 type NftHolding1155Count struct {
-	Symbol     string `json:"symbol"`
 	Value      int64  `json:"value"`
 	Collection string `json:"collection"`
 }

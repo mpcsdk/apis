@@ -30,7 +30,8 @@ func (s *ControllerV1) NftHoldingCount(ctx context.Context, req *v1.NftHoldingCo
 	aggCount := map[string]*v1.NftHoldingCount{}
 	for _, rst := range rsts {
 		if abi, ok := s.contracts[rst.Contract]; !ok {
-			return nil, mpccode.CodeParamInvalid(abi.ContractName)
+			g.Log().Info(ctx, "NftHoldingCount not found:", rst.Contract)
+			continue
 		} else {
 			if _, ok := aggCount[abi.ContractName]; !ok {
 				aggCount[abi.ContractName] = &v1.NftHoldingCount{

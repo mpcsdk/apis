@@ -24,9 +24,9 @@ func (s *ControllerV1) NftHoldingCount1155(ctx context.Context, req *v1.NftHoldi
 	}
 	////
 	rsts, err := s.nftHolding.QueryCount(ctx, &mpcdao.QueryNftHolding{
-		ChainId:   req.ChainId,
-		Address:   common.HexToAddress(req.Address).String(),
-		Contracts: []string{common.HexToAddress(req.Collection).String()},
+		ChainId:  req.ChainId,
+		Address:  common.HexToAddress(req.Address).String(),
+		Contract: common.HexToAddress(req.Collection).String(),
 	})
 	if err != nil {
 		g.Log().Warning(ctx, "NftHoldingCount1155:", "err:", err)
@@ -37,7 +37,8 @@ func (s *ControllerV1) NftHoldingCount1155(ctx context.Context, req *v1.NftHoldi
 	aggCount := map[string]*v1.NftHolding1155Count{}
 	for _, rst := range rsts {
 		if abi, ok := s.contracts[rst.Contract]; !ok {
-			return nil, mpccode.CodeParamInvalid(abi.ContractName)
+			g.Log().Info(ctx, "NftHoldingCount1155 not found:", rst.Contract)
+			continue
 		} else {
 			if _, ok := aggCount[abi.ContractAddress]; !ok {
 				aggCount[abi.ContractAddress] = &v1.NftHolding1155Count{

@@ -39,6 +39,7 @@ func NewV1() enhanced.IEnhancedV1 {
 	if err != nil {
 		panic(err)
 	}
+	g.Dump(contracts)
 	for _, c := range contracts {
 		s.contracts[c.ContractAddress] = c
 		if _, ok := s.collectionNames[c.ContractName]; ok {

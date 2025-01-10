@@ -17,16 +17,17 @@ type Server struct {
 	Name      string `json:"name" v:"required"`
 	RateLimit int    `json:"rateLimit" v:"required|min:1"`
 }
-type Nrpcfg struct {
+type NatsCfg struct {
 	NatsUrl string `json:"natsUrl" v:"required"`
+	TimeOut int    `json:"timeOut" v:"required|min:1"`
 }
 
 // //
 
 type Cfg struct {
-	Server *Server `json:"server" v:"required"`
-	Cache  *Cache  `json:"cache" v:"required"`
-	Nrpc   *Nrpcfg `json:"nrpc" v:"required"`
+	Server *Server  `json:"server" v:"required"`
+	Cache  *Cache   `json:"cache" v:"required"`
+	Nats   *NatsCfg `json:"nats" v:"required"`
 }
 
 var Config = &Cfg{}

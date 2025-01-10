@@ -2,6 +2,7 @@ package db
 
 import (
 	"apis/internal/conf"
+	"apis/internal/service"
 	"context"
 	"errors"
 
@@ -19,8 +20,6 @@ type sDB struct {
 	r             *gredis.Redis
 	dur           int
 	chainTransfer map[int64]*mpcdao.ChainTransfer
-	riskCtrlRule  *mpcdao.RiskCtrlRule
-	chainCfg      *mpcdao.ChainCfg
 }
 
 func isPgErr(err error, key string) bool {
@@ -104,12 +103,6 @@ func (s *sDB) InsertTransferBatch(ctx context.Context, chainId int64, datas []*e
 	return nil
 }
 
-func (s *sDB) ContractAbi() *mpcdao.RiskCtrlRule {
-	return s.riskCtrlRule
-}
-func (s *sDB) ChainCfg() *mpcdao.ChainCfg {
-	return s.chainCfg
-}
 func New() *sDB {
 
 	///
@@ -124,17 +117,11 @@ func New() *sDB {
 		r:             r,
 		dur:           conf.Config.Cache.Duration,
 		chainTransfer: map[int64]*mpcdao.ChainTransfer{},
-		//mapmpcdao.NewChainTransfer(r, conf.Config.Cache.SessionDuration),
-		riskCtrlRule: mpcdao.NewRiskCtrlRule(r, conf.Config.Cache.Duration),
-		chainCfg:     mpcdao.NewChainCfg(r, conf.Config.Cache.Duration),
 	}
-	////chains cfg
-	cfgs, err := s.chainCfg.AllCfg(gctx.GetInitCtx())
-	if err != nil {
-		panic(err)
-	}
-	for _, cfg := range cfgs {
-		err = s.InitChainTransferDB(gctx.GetInitCtx(), cfg.ChainId)
+	//// notice: ensure allchain is loaded
+	chains := service.RiskAdmin().RiskAdminCfg().AllChain()
+	for _, chain := range chains {
+		err = s.InitChainTransferDB(gctx.GetInitCtx(), chain.ChainId)
 		if err != nil {
 			panic(err)
 		}

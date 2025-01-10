@@ -15,46 +15,62 @@ import (
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/mpcsdk/mpcCommon/mpcdao"
 	"github.com/mpcsdk/mpcCommon/mpcdao/model/entity"
+	mpcdaoutil "github.com/mpcsdk/mpcCommon/mpcdao/util"
 )
 
 var bigZero = big.NewInt(0)
 
 type ControllerV1 struct {
-	redis           *gredis.Redis
-	contracts       map[string]*entity.Contractabi
-	collectionNames map[string][]*entity.Contractabi
+	redis *gredis.Redis
+	// contracts       map[string]*entity.RiskadminContractabi
+	collectionNames map[string][]*entity.RiskadminContractabi
 	//db
 	enhanced_riskctrl *mpcdao.EnhancedRiskCtrl
 	nftHolding        *mpcdao.NftHolding
 }
 
-func NewV1() enhanced.IEnhancedV1 {
-	s := &ControllerV1{
-		contracts:       make(map[string]*entity.Contractabi),
-		collectionNames: map[string][]*entity.Contractabi{},
+func (s *ControllerV1) isEnableChain(chainId int64) bool {
+	enableChains := service.RiskAdmin().RiskAdminCfg().AllChain()
+	if _, ok := enableChains[int64(chainId)]; ok {
+		return true
 	}
+	return false
+}
+func (s *ControllerV1) isEnableContract(chainId int64, contract string) bool {
+	enableContracts := service.RiskAdmin().RiskAdminCfg().AllContract()
+	if _, ok := enableContracts[mpcdaoutil.RiskadminContractabiKey(chainId, contract)]; ok {
+		return true
+	}
+	return false
+
+}
+func NewV1() enhanced.IEnhancedV1 {
 	///
 	ctx := gctx.GetInitCtx()
-	contracts, err := service.DB().ContractAbi().GetContractAbiBriefs(ctx, 0, "")
-	if err != nil {
-		panic(err)
-	}
-	g.Dump(contracts)
-	for _, c := range contracts {
-		s.contracts[c.ContractAddress] = c
-		if _, ok := s.collectionNames[c.ContractName]; ok {
-			s.collectionNames[c.ContractName] = append(s.collectionNames[c.ContractName], c)
-		} else {
-			s.collectionNames[c.ContractName] = []*entity.Contractabi{c}
-		}
-	}
-	///
 	r := g.Redis("aggTx")
-	_, err = r.Conn(ctx)
+	_, err := r.Conn(ctx)
 	if err != nil {
 		panic(err)
 	}
 	/////
+
+	s := &ControllerV1{
+		// contracts:       make(map[string]*entity.RiskadminContractabi),
+		collectionNames: map[string][]*entity.RiskadminContractabi{},
+	}
+	///
+
+	// contracts := service.RiskAdmin().RiskAdminCfg().AllContract()
+	// for _, c := range contracts {
+	// 	s.contracts[c.ContractAddress] = c
+	// 	if _, ok := s.collectionNames[c.ContractName]; ok {
+	// 		s.collectionNames[c.ContractName] = append(s.collectionNames[c.ContractName], c)
+	// 	} else {
+	// 		s.collectionNames[c.ContractName] = []*entity.RiskadminContractabi{c}
+	// 	}
+	// }
+	// g.Dump(s.contracts)
+
 	s.enhanced_riskctrl = mpcdao.NewEnhancedRiskCtrl(r, conf.Config.Cache.Duration)
 	s.nftHolding = mpcdao.NewNftHolding()
 	s.redis = r

@@ -94,9 +94,9 @@ var (
 		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
 			s := g.Server()
 			s.Group("/", func(group *ghttp.RouterGroup) {
+				group.Middleware(MiddlewareCORS)
 				group.Middleware(RateLimit)
 				group.Middleware(MiddlewareErrorHandler)
-				group.Middleware(MiddlewareCORS)
 				group.Middleware(ResponseHandler)
 				group.Group("/chaindata", func(group *ghttp.RouterGroup) {
 					group.Bind(chaindata.NewV1())

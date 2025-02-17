@@ -11,7 +11,6 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/mpcsdk/mpcCommon/mpccode"
 	"github.com/mpcsdk/mpcCommon/mpcdao"
-	mpcdaoutil "github.com/mpcsdk/mpcCommon/mpcdao/util"
 )
 
 func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.QueryRes, err error) {
@@ -25,16 +24,16 @@ func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.Que
 		return nil, mpccode.CodeParamInvalid("from, to, contract can't be all empty")
 	}
 	/////
-	enableChains := service.RiskAdmin().RiskAdminCfg().AllChain()
-	if _, ok := enableChains[req.ChainId]; !ok {
-		g.Log().Warning(ctx, "chainId not enable:", req)
-		return nil, nil
-	}
-	contracts := service.RiskAdmin().RiskAdminCfg().AllContract()
-	if _, ok := contracts[mpcdaoutil.RiskadminContractabiKey(req.ChainId, req.Contract)]; !ok {
-		g.Log().Warning(ctx, "contract not enable:", req)
-		return nil, nil
-	}
+	// enableChains := service.RiskAdmin().RiskAdminCfg().AllChain()
+	// if _, ok := enableChains[req.ChainId]; !ok {
+	// 	g.Log().Warning(ctx, "chainId not enable:", req)
+	// 	return nil, nil
+	// }
+	// contracts := service.RiskAdmin().RiskAdminCfg().AllContract()
+	// if _, ok := contracts[mpcdaoutil.RiskadminContractabiKey(req.ChainId, req.Contract)]; !ok {
+	// 	g.Log().Warning(ctx, "contract not enable:", req)
+	// 	return nil, nil
+	// }
 	//////
 	//////
 	if req.StartTime >= req.EndTime {
@@ -105,12 +104,12 @@ func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.Que
 			Symbol: func() string {
 				////
 				if r.Kind == "external" {
-					chain := enableChains[r.ChainId]
+					chain := c.chains[r.ChainId]
 					if chain != nil {
 						return chain.Coin
 					}
 				} else {
-					contract := contracts[r.Contract]
+					contract := c.contracts[r.Contract]
 					if contract != nil {
 						return contract.ContractName
 					}
@@ -125,7 +124,7 @@ func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.Que
 					s := fval.Text('f', -1)
 					return s
 				} else if r.Kind == "erc20" {
-					contract := contracts[r.Contract]
+					contract := c.contracts[r.Contract]
 					if contract != nil {
 						fbalance := big.NewFloat(0)
 						fbalance.SetString(r.Value)

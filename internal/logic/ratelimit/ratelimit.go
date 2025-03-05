@@ -23,3 +23,10 @@ func NewLimiter(limit int) *sRateLimiter {
 func (s *sRateLimiter) Allow() bool {
 	return s.rateLimit.Allow()
 }
+
+func (s *sRateLimiter) Limit() int64 {
+	return int64(s.rateLimit.Limit())
+}
+func (s *sRateLimiter) Tokens() int64 {
+	return int64(s.rateLimit.Tokens())
+}

@@ -1,8 +1,6 @@
 package ratelimit
 
 import (
-	"time"
-
 	"golang.org/x/time/rate"
 )
 
@@ -12,8 +10,7 @@ type sRateLimiter struct {
 }
 
 func NewLimiter(limit int) *sRateLimiter {
-	every := rate.Every(time.Second)
-	rateLimit := rate.NewLimiter(every, limit)
+	rateLimit := rate.NewLimiter(rate.Limit(limit), limit)
 	return &sRateLimiter{
 		limit:     limit,
 		rateLimit: rateLimit,

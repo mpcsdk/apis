@@ -19,15 +19,16 @@ var apiLimit = mpccode.CodeApiLimit
 
 func RateLimit(r *ghttp.Request) {
 	if service.RateLimiter().Allow() {
+		g.Log().Debug(r.Context(), "RateLimit:", service.RateLimiter().Tokens(), service.RateLimiter().Limit())
 		r.Middleware.Next()
 	} else {
+		g.Log().Debug(r.Context(), "RateLimit limited:", service.RateLimiter().Tokens(), service.RateLimiter().Limit())
 		r.Response.WriteJson(ghttp.DefaultHandlerResponse{
 			Code:    100,
 			Message: "api limit",
 			Data:    nil,
 		})
 	}
-
 }
 func MiddlewareErrorHandler(r *ghttp.Request) {
 	r.Middleware.Next()

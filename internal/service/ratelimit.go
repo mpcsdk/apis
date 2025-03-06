@@ -8,6 +8,8 @@ package service
 type (
 	IRateLimiter interface {
 		Allow() bool
+		Limit() int64
+		Tokens() int64
 	}
 )
 

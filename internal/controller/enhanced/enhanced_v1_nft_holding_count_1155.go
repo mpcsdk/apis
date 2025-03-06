@@ -10,7 +10,6 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/mpcsdk/mpcCommon/mpccode"
 	"github.com/mpcsdk/mpcCommon/mpcdao"
-	mpcdaoutil "github.com/mpcsdk/mpcCommon/mpcdao/util"
 )
 
 func (s *ControllerV1) NftHoldingCount1155(ctx context.Context, req *v1.NftHoldingCount1155Req) (res *v1.NftHoldingCount1155Res, err error) {
@@ -26,14 +25,14 @@ func (s *ControllerV1) NftHoldingCount1155(ctx context.Context, req *v1.NftHoldi
 		return nil, mpccode.CodeParamInvalid("collection")
 	}
 	/////
-	if !s.isEnableChain(req.ChainId) {
+	chains := service.RiskAdmin().RiskAdminCfg().GetChain(req.ChainId)
+	if chains == nil || chains.IsEnable == 0 {
+		g.Log().Warning(ctx, "chainId not enable:", req)
 		return nil, nil
 	}
-	if !s.isEnableContract(req.ChainId, req.Collection) {
+	if abi := service.RiskAdmin().RiskAdminCfg().GetContract(req.ChainId, req.Collection); abi == nil {
 		return nil, nil
 	}
-	contracts := service.RiskAdmin().RiskAdminCfg().AllContract()
-	/////
 	////
 	rsts, err := s.nftHolding.QueryCount(ctx, &mpcdao.QueryNftHolding{
 		ChainId:  req.ChainId,
@@ -48,7 +47,8 @@ func (s *ControllerV1) NftHoldingCount1155(ctx context.Context, req *v1.NftHoldi
 	////
 	aggCount := map[string]*v1.NftHolding1155Count{}
 	for _, rst := range rsts {
-		if abi, ok := contracts[mpcdaoutil.RiskadminContractabiKey(rst.ChainId, rst.Contract)]; !ok {
+		// if abi, ok := s.contracts[rst.Contract]; !ok {
+		if abi := service.RiskAdmin().RiskAdminCfg().GetContract(req.ChainId, rst.Contract); abi == nil {
 			g.Log().Info(ctx, "NftHoldingCount1155 not found:", rst.Contract)
 			continue
 		} else {

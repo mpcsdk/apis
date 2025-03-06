@@ -7,15 +7,12 @@ package enhanced
 import (
 	"apis/api/enhanced"
 	"apis/internal/conf"
-	"apis/internal/service"
 	"math/big"
 
 	"github.com/gogf/gf/v2/database/gredis"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gctx"
 	"github.com/mpcsdk/mpcCommon/mpcdao"
-	"github.com/mpcsdk/mpcCommon/mpcdao/model/entity"
-	mpcdaoutil "github.com/mpcsdk/mpcCommon/mpcdao/util"
 )
 
 var bigZero = big.NewInt(0)
@@ -23,27 +20,51 @@ var bigZero = big.NewInt(0)
 type ControllerV1 struct {
 	redis *gredis.Redis
 	// contracts       map[string]*entity.RiskadminContractabi
-	collectionNames map[string][]*entity.RiskadminContractabi
+	// collectionNames map[string][]*entity.RiskadminContractabi
 	//db
 	enhanced_riskctrl *mpcdao.EnhancedRiskCtrl
 	nftHolding        *mpcdao.NftHolding
 }
 
-func (s *ControllerV1) isEnableChain(chainId int64) bool {
-	enableChains := service.RiskAdmin().RiskAdminCfg().AllChain()
-	if _, ok := enableChains[int64(chainId)]; ok {
-		return true
-	}
-	return false
-}
-func (s *ControllerV1) isEnableContract(chainId int64, contract string) bool {
-	enableContracts := service.RiskAdmin().RiskAdminCfg().AllContract()
-	if _, ok := enableContracts[mpcdaoutil.RiskadminContractabiKey(chainId, contract)]; ok {
-		return true
-	}
-	return false
-
-}
+//	func (s *ControllerV1) isEnableChain(chainId int64) bool {
+//		if chainId == 0 {
+//			return true
+//		}
+//		chains := service.RiskAdmin().RiskAdminCfg().GetChain(req.ChainId)
+//		if chains == nil || chains.IsEnable == 0 {
+//			g.Log().Warning(ctx, "chainId not enable:", req)
+//			return nil, nil
+//		}
+//		return false
+//	}
+//
+//	func (s *ControllerV1) getContract(chainId int64, contract string) *entity.RiskadminContractabi {
+//		enableContracts := service.RiskAdmin().RiskAdminCfg().AllContract()
+//		if chainId > 0 {
+//			if contract, ok := enableContracts[mpcdaoutil.RiskadminContractabiKey(chainId, contract)]; ok {
+//				return contract
+//			}
+//			return nil
+//		} else {
+//			for _, c := range enableContracts {
+//				if c.ContractAddress == contract {
+//					return c
+//				}
+//			}
+//			return nil
+//		}
+//	}
+//
+//	func (s *ControllerV1) isEnableContract(chainId int64, contract string) bool {
+//		if chainId == 0 {
+//			return true
+//		}
+//		c := service.RiskAdmin().RiskAdminCfg().GetContract(chainId, contract)
+//		if c == nil {
+//			return false
+//		}
+//		return true
+//	}
 func NewV1() enhanced.IEnhancedV1 {
 	///
 	ctx := gctx.GetInitCtx()
@@ -56,7 +77,7 @@ func NewV1() enhanced.IEnhancedV1 {
 
 	s := &ControllerV1{
 		// contracts:       make(map[string]*entity.RiskadminContractabi),
-		collectionNames: map[string][]*entity.RiskadminContractabi{},
+		// collectionNames: map[string][]*entity.RiskadminContractabi{},
 	}
 	///
 

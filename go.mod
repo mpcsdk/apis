@@ -6,6 +6,10 @@ toolchain go1.22.9
 
 require (
 	github.com/ethereum/go-ethereum v1.14.5
+	github.com/fbsobreira/gotron-sdk v0.0.0-20230907131216-1e824406fe8c
+	github.com/gogf/gf/contrib/drivers/mysql/v2 v2.7.4
+	github.com/gogf/gf/contrib/drivers/pgsql/v2 v2.7.4
+	github.com/gogf/gf/contrib/nosql/redis/v2 v2.7.4
 	github.com/gogf/gf/v2 v2.7.4
 	github.com/lib/pq v1.10.9
 	github.com/mpcsdk/mpcCommon v0.0.0
@@ -15,8 +19,10 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
+	github.com/btcsuite/btcd/btcec/v2 v2.2.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/clbanning/mxj/v2 v2.7.0 // indirect
+	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/evanphx/json-patch v0.5.2 // indirect
@@ -26,9 +32,6 @@ require (
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-sql-driver/mysql v1.7.1 // indirect
-	github.com/gogf/gf/contrib/drivers/mysql/v2 v2.7.4 // indirect
-	github.com/gogf/gf/contrib/drivers/pgsql/v2 v2.7.4 // indirect
-	github.com/gogf/gf/contrib/nosql/redis/v2 v2.7.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/grokify/html-strip-tags-go v0.1.0 // indirect
@@ -45,6 +48,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/redis/go-redis/v9 v9.2.1 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
+	github.com/shengdoushi/base58 v1.0.0 // indirect
 	go.opentelemetry.io/otel v1.32.0 // indirect
 	go.opentelemetry.io/otel/metric v1.32.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.32.0 // indirect

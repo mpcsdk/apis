@@ -32,24 +32,25 @@ func isPgErr(err error, key string) bool {
 	return false
 }
 func (s *sDB) InitChainTransferDB(ctx context.Context, chainId int64) error {
-	err := mpcdao.CreateChainTransferDB(ctx, chainId)
+	err := mpcdao.InitSyncChainDB(ctx, chainId)
 	if err != nil {
-		if isPgErr(err, "42P04") {
-			///exists
-		} else {
-			return err
-		}
+		panic(err)
+		// if isPgErr(err, "42P04") {
+		// 	///exists
+		// } else {
+		// 	return err
+		// }
 	}
 	chaindb := mpcdao.NewChainTransfer(chainId, s.r, s.dur)
 	s.chainTransfer[chainId] = chaindb
 	return nil
 }
-func (s *sDB) QueryTransfer(ctx context.Context, chainId int64, query *mpcdao.QueryData) ([]*entity.ChainTransfer, error) {
+func (s *sDB) QueryTransfer(ctx context.Context, chainId int64, query *mpcdao.QueryData) ([]*entity.SyncchainChainTransfer, error) {
 	// return s.chainTransfer.Query(ctx, query)
 	if chaindb, ok := s.chainTransfer[chainId]; ok {
 		return chaindb.Query(ctx, query)
 	} else {
-		g.Log().Error(ctx, "QueryTransfer:", "chainId:", chainId, "query:", query)
+		g.Log().Error(ctx, "QueryTransfer chainId not support:", chainId, "query:", query)
 		return nil, nil
 	}
 }
@@ -64,7 +65,7 @@ func isDuplicateKeyErr(err error) bool {
 	}
 	return false
 }
-func (s *sDB) InsertTransfer(ctx context.Context, chainId int64, data *entity.ChainTransfer) error {
+func (s *sDB) InsertTransfer(ctx context.Context, chainId int64, data *entity.SyncchainChainTransfer) error {
 	// err := s.chainTransfer.Insert(ctx, data)
 	chaindb := s.chainTransfer[chainId]
 	if chaindb == nil {
@@ -89,7 +90,7 @@ func (s *sDB) DelChainBlock(ctx context.Context, chainId int64, block int64) err
 	return err
 
 }
-func (s *sDB) InsertTransferBatch(ctx context.Context, chainId int64, datas []*entity.ChainTransfer) error {
+func (s *sDB) InsertTransferBatch(ctx context.Context, chainId int64, datas []*entity.SyncchainChainTransfer) error {
 	// err := s.chainTransfer.InsertBatch(ctx, datas)
 	chaindb := s.chainTransfer[chainId]
 	if chaindb == nil {

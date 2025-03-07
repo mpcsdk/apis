@@ -8,8 +8,10 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/fbsobreira/gotron-sdk/pkg/address"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/mpcsdk/mpcCommon/mpccode"
+	"github.com/mpcsdk/mpcCommon/mpcconsts"
 	"github.com/mpcsdk/mpcCommon/mpcdao"
 )
 
@@ -19,22 +21,40 @@ func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.Que
 	if req.ChainId == 0 {
 		return nil, mpccode.CodeParamInvalid("need specify chainId")
 	}
-	/////
 	if req.From == "" && req.To == "" && req.Contract == "" {
 		return nil, mpccode.CodeParamInvalid("from, to, contract can't be all empty")
 	}
+	////
+	////
+	if req.ChainId == mpcconsts.Tron ||
+		req.ChainId == mpcconsts.TronShasta {
+		if req.From != "" {
+			addr, err := address.Base58ToAddress(req.From)
+			if err != nil {
+				g.Log().Error(ctx, "Query :", "err:", err)
+				return nil, mpccode.CodeParamInvalid("invalid from address")
+			}
+			req.From = addr.Hex()
+		}
+		if req.To != "" {
+			addr, err := address.Base58ToAddress(req.To)
+			if err != nil {
+				g.Log().Error(ctx, "Query :", "err:", err)
+				return nil, mpccode.CodeParamInvalid("invalid To address")
+			}
+			req.To = addr.String()
+		}
+		if req.Contract != "" {
+			addr, err := address.Base58ToAddress(req.Contract)
+			if err != nil {
+				g.Log().Error(ctx, "Query :", "err:", err)
+				return nil, mpccode.CodeParamInvalid("invalid Contract address")
+			}
+			req.Contract = addr.String()
+		}
+		g.Log().Debug(ctx, "Tron Query :", "req:", req)
+	}
 	/////
-	// enableChains := service.RiskAdmin().RiskAdminCfg().AllChain()
-	// if _, ok := enableChains[req.ChainId]; !ok {
-	// 	g.Log().Warning(ctx, "chainId not enable:", req)
-	// 	return nil, nil
-	// }
-	// contracts := service.RiskAdmin().RiskAdminCfg().AllContract()
-	// if _, ok := contracts[mpcdaoutil.RiskadminContractabiKey(req.ChainId, req.Contract)]; !ok {
-	// 	g.Log().Warning(ctx, "contract not enable:", req)
-	// 	return nil, nil
-	// }
-	//////
 	//////
 	if req.StartTime >= req.EndTime {
 		return nil, mpccode.CodeParamInvalid("startTime >= endTime")

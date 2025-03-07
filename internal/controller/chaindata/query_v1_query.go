@@ -13,6 +13,7 @@ import (
 	"github.com/mpcsdk/mpcCommon/mpccode"
 	"github.com/mpcsdk/mpcCommon/mpcconsts"
 	"github.com/mpcsdk/mpcCommon/mpcdao"
+	"github.com/mpcsdk/mpcCommon/mpcdao/model/entity"
 )
 
 func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.QueryRes, err error) {
@@ -55,6 +56,11 @@ func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.Que
 		g.Log().Debug(ctx, "Tron Query :", "req:", req)
 	}
 	/////
+	reqchain := service.RiskAdmin().RiskAdminCfg().GetChain(req.ChainId)
+	if reqchain == nil || reqchain.IsEnable == 0 {
+		g.Log().Warning(ctx, "chainId not enable:", req)
+		return nil, nil
+	}
 	//////
 	if req.StartTime >= req.EndTime {
 		return nil, mpccode.CodeParamInvalid("startTime >= endTime")
@@ -110,6 +116,21 @@ func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.Que
 	/////
 	res = &v1.QueryRes{}
 	for _, r := range results {
+		var contract *entity.RiskadminContractabi = nil
+		var chain *entity.RiskadminChaincfg = nil
+		if r.Kind == "external" {
+			chain = service.RiskAdmin().RiskAdminCfg().GetChain(r.ChainId)
+			if chain == nil || chain.IsEnable == 0 {
+				g.Log().Debug(ctx, "Query unsuppport chainCoin:", r)
+				continue
+			}
+		} else {
+			contract = service.RiskAdmin().RiskAdminCfg().GetContract(r.ChainId, r.Contract)
+			if contract == nil {
+				g.Log().Debug(ctx, "Query unsuppport contract:", r)
+				continue
+			}
+		}
 
 		res.Result = append(res.Result, &v1.QueryResult{
 			ChainId:   r.ChainId,
@@ -124,17 +145,14 @@ func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.Que
 			Symbol: func() string {
 				////
 				if r.Kind == "external" {
-					chain := c.chains[r.ChainId]
-					if chain != nil {
-						return chain.Coin
-					}
+					return chain.Coin
+					// chain := c.chains[r.ChainId]
+					// if chain != nil {
+					// 	return chain.Coin
+					// }
 				} else {
-					contract := c.contracts[r.Contract]
-					if contract != nil {
-						return contract.ContractName
-					}
+					return contract.ContractName
 				}
-				return ""
 			}(),
 			Value: func() string {
 				if r.Kind == "external" {

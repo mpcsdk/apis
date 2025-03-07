@@ -50,6 +50,11 @@ func (s *ControllerV1) nftHoldingCollectionName(ctx context.Context, req *v1.Nft
 	///
 	nfts := []*v1.NftHolding{}
 	for _, nft := range rst {
+		reqchain := service.RiskAdmin().RiskAdminCfg().GetChain(nft.ChainId)
+		if reqchain.IsEnable == 0 {
+			g.Log().Debug(ctx, "NftHolding Query chain not enable:", nft)
+			continue
+		}
 		nfts = append(nfts, &v1.NftHolding{
 			ChainId: nft.ChainId,
 			Address: nft.Address,

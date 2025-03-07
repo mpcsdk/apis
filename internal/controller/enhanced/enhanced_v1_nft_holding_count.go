@@ -10,7 +10,6 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/mpcsdk/mpcCommon/mpccode"
 	"github.com/mpcsdk/mpcCommon/mpcdao"
-	mpcdaoutil "github.com/mpcsdk/mpcCommon/mpcdao/util"
 )
 
 func (s *ControllerV1) NftHoldingCount(ctx context.Context, req *v1.NftHoldingCountReq) (*v1.NftHoldingCountRes, error) {
@@ -19,7 +18,6 @@ func (s *ControllerV1) NftHoldingCount(ctx context.Context, req *v1.NftHoldingCo
 		return nil, mpccode.CodeParamInvalid("address")
 	}
 	///
-
 	////
 	rsts, err := s.nftHolding.QueryCount(ctx, &mpcdao.QueryNftHolding{
 		ChainId: req.ChainId,
@@ -31,26 +29,40 @@ func (s *ControllerV1) NftHoldingCount(ctx context.Context, req *v1.NftHoldingCo
 	}
 	g.Log().Debug(ctx, "NftHoldingCount:", "rsts:", rsts)
 	////
-	contracts := service.RiskAdmin().RiskAdminCfg().AllContract()
+	// contracts := service.RiskAdmin().RiskAdminCfg().AllContract()
 	aggCount := map[string]*v1.NftHoldingCount{}
 	for _, rst := range rsts {
-		if !s.isEnableChain(rst.ChainId) {
-			g.Log().Warning(ctx, "NftHoldingCount chainId not enable:", rst.ChainId)
-			continue
-		}
-		if contract, ok := contracts[mpcdaoutil.RiskadminContractabiKey(rst.ChainId, rst.Contract)]; !ok {
+		// if abi, ok := s.contracts[rst.Contract]; !ok {
+		if abi := service.RiskAdmin().RiskAdminCfg().GetContract(req.ChainId, rst.Contract); abi == nil {
 			g.Log().Info(ctx, "NftHoldingCount not found:", rst.Contract)
 			continue
 		} else {
-			if _, ok := aggCount[contract.ContractName]; !ok {
-				aggCount[contract.ContractName] = &v1.NftHoldingCount{
-					Symbol: contract.ContractName,
+			if _, ok := aggCount[abi.ContractName]; !ok {
+				aggCount[abi.ContractName] = &v1.NftHoldingCount{
+					Symbol: abi.ContractName,
 					Value:  rst.Value,
 				}
 			} else {
-				aggCount[contract.ContractName].Value += rst.Value
+				aggCount[abi.ContractName].Value += rst.Value
 			}
 		}
+		// if !s.isEnableChain(rst.ChainId) {
+		// 	g.Log().Warning(ctx, "NftHoldingCount chainId not enable:", rst.ChainId)
+		// 	continue
+		// }
+		// if contract, ok := contracts[mpcdaoutil.RiskadminContractabiKey(rst.ChainId, rst.Contract)]; !ok {
+		// 	g.Log().Info(ctx, "NftHoldingCount not found:", rst.Contract)
+		// 	continue
+		// } else {
+		// 	if _, ok := aggCount[contract.ContractName]; !ok {
+		// 		aggCount[contract.ContractName] = &v1.NftHoldingCount{
+		// 			Symbol: contract.ContractName,
+		// 			Value:  rst.Value,
+		// 		}
+		// 	} else {
+		// 		aggCount[contract.ContractName].Value += rst.Value
+		// 	}
+		// }
 	}
 	//////
 	res := &v1.NftHoldingCountRes{

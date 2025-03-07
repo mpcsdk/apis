@@ -32,14 +32,10 @@ func isPgErr(err error, key string) bool {
 	return false
 }
 func (s *sDB) InitChainTransferDB(ctx context.Context, chainId int64) error {
+	// err := mpcdao.CreateChainTransferDB(ctx, chainId)
 	err := mpcdao.InitSyncChainDB(ctx, chainId)
 	if err != nil {
 		panic(err)
-		// if isPgErr(err, "42P04") {
-		// 	///exists
-		// } else {
-		// 	return err
-		// }
 	}
 	chaindb := mpcdao.NewChainTransfer(chainId, s.r, s.dur)
 	s.chainTransfer[chainId] = chaindb

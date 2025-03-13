@@ -4,27 +4,36 @@ server:
   workId: 1
   openapiPath: "/api.json"
   swaggerPath: "/swagger"
-  rateLimit: 1
+  rateLimit: 500
 
 logger:
-  level: "info"
+  level: "debug"
   stdout: true
   rotateExpire: "1d"
   path: "./"
+cmc:
+  quotesUrl: "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
+  apiKey: "apikey"
+  symbolList: "TRX,BTC"
+  cmcInterval: 900
 
 database:
   sync_chain:
-    - link: "pgsql:postgres:123456@tcp(110.238.104.73:10100)/sync_chain"
+    # - link: "pgsql:postgres:123456@tcp(110.238.104.73:10100)/sync_chain"
+    - link: "pgsql:postgres:123456@tcp(192.168.0.201:5432)/sync_chain"
   riskctrl:
     # - link: "mysql:riskcontrol:123456@tcp(110.238.104.73:10090)/riskcontrol"
     - link: "mysql:riskcontrol:123456@tcp(127.0.0.1:3306)/riskcontrol"
   enhanced_riskctrl:
-    - link: "pgsql:postgres:123456@tcp(110.238.104.73:10100)/enhanced_riskctrl"
+    #- link: "pgsql:postgres:123456@tcp(110.238.104.73:10100)/enhanced_riskctrl"
+    - link: "pgsql:postgres:123456@tcp(127.0.0.1:5432)/enhanced_riskctrl"
       role: "master"
-    - link: "pgsql:postgres:123456@tcp(110.238.104.73:10100)/enhanced_riskctrl"
+    - link: "pgsql:postgres:123456@tcp(127.0.0.1:5432)/enhanced_riskctrl"
+      #- link: "pgsql:postgres:123456@tcp(110.238.104.73:10100)/enhanced_riskctrl"
       role: "slave"
   sync_nft_holding:
-    - link: "pgsql:postgres:123456@tcp(110.238.104.73:10100)/sync_nft_holding"
+    #- link: "pgsql:postgres:123456@tcp(110.238.104.73:10100)/sync_nft_holding"
+    - link: "pgsql:postgres:123456@tcp(127.0.0.1:5432)/sync_nft_holding"
 cache:
   duration: 2000
 
@@ -35,10 +44,10 @@ nats:
 # redis
 redis:
   default:
-    address: 127.0.0.1:10060
+    address: 127.0.0.1:6379
     db: 1
   cache:
-    address: 127.0.0.1:10060
+    address: 127.0.0.1:6379
     db: 2
   aggTx:
     address: 127.0.0.1:6379

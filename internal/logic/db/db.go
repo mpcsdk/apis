@@ -118,6 +118,9 @@ func New() *sDB {
 	//// notice: ensure allchain is loaded
 	chains := service.RiskAdmin().RiskAdminCfg().AllChain()
 	for _, chain := range chains {
+		if chain.IsEnable == 0 {
+			continue
+		}
 		err = s.InitChainTransferDB(gctx.GetInitCtx(), chain.ChainId)
 		if err != nil {
 			panic(err)

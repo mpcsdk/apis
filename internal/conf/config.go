@@ -21,6 +21,12 @@ type NatsCfg struct {
 	NatsUrl string `json:"natsUrl" v:"required"`
 	TimeOut int    `json:"timeOut" v:"required|min:1"`
 }
+type CMCCfg struct {
+	QuotesUrl   string `json:"quotesUrl" v:"required"`
+	SymbolList  string `json:"symbolList" v:"required"`
+	ApiKey      string `json:"apiKey" v:"required"`
+	CmcInterval int    `json:"cmcInterval" v:"required|min:1"`
+}
 
 // //
 
@@ -28,6 +34,7 @@ type Cfg struct {
 	Server *Server  `json:"server" v:"required"`
 	Cache  *Cache   `json:"cache" v:"required"`
 	Nats   *NatsCfg `json:"nats" v:"required"`
+	CMC    *CMCCfg  `json:"cmc" v:"required"`
 }
 
 var Config = &Cfg{}

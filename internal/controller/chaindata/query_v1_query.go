@@ -28,7 +28,8 @@ func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.Que
 	////
 	////
 	if req.ChainId == mpcconsts.Tron ||
-		req.ChainId == mpcconsts.TronShasta {
+		req.ChainId == mpcconsts.TronShasta ||
+		req.ChainId == mpcconsts.Tronnile {
 		if req.From != "" {
 			addr, err := address.Base58ToAddress(req.From)
 			if err != nil {

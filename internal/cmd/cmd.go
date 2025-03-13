@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"apis/internal/controller/chaindata"
+	"apis/internal/controller/cmcqutoe"
 	"apis/internal/controller/enhanced"
 	"apis/internal/service"
 	"context"
@@ -104,6 +105,9 @@ var (
 				})
 				group.Group("/enhanced", func(group *ghttp.RouterGroup) {
 					group.Bind(enhanced.NewV1())
+				})
+				group.Group("/cmc", func(group *ghttp.RouterGroup) {
+					group.Bind(cmcqutoe.NewV1())
 				})
 			})
 			s.Run()

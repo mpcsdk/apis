@@ -5,6 +5,7 @@
 package logic
 
 import (
+	_ "apis/internal/logic/cmc"
 	_ "apis/internal/logic/db"
 	_ "apis/internal/logic/ratelimit"
 	_ "apis/internal/logic/riskadmin"

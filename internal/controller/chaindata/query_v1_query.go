@@ -16,6 +16,29 @@ import (
 	"github.com/mpcsdk/mpcCommon/mpcdao/model/entity"
 )
 
+func wrapOutAddr(chainId int64, addr string) string {
+	switch chainId {
+	case mpcconsts.Tron, mpcconsts.TronShasta, mpcconsts.TronNile:
+		addr := address.HexToAddress(addr)
+		return addr.String()
+	}
+	return addr
+}
+
+func wrapInputAddr(chainId int64, addr string) (string, error) {
+	if addr == "" {
+		return "", nil
+	}
+	switch chainId {
+	case mpcconsts.Tron, mpcconsts.TronShasta, mpcconsts.TronNile:
+		baddr, err := address.Base58ToAddress(addr)
+		if err != nil {
+			return addr, err
+		}
+		return baddr.Hex(), nil
+	}
+	return addr, nil
+}
 func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.QueryRes, err error) {
 	g.Log().Debug(ctx, "Query req:", req)
 	///
@@ -26,36 +49,23 @@ func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.Que
 		return nil, mpccode.CodeParamInvalid("from, to, contract can't be all empty")
 	}
 	////
-	////
-	if req.ChainId == mpcconsts.Tron ||
-		req.ChainId == mpcconsts.TronShasta ||
-		req.ChainId == mpcconsts.Tronnile {
-		if req.From != "" {
-			addr, err := address.Base58ToAddress(req.From)
-			if err != nil {
-				g.Log().Error(ctx, "Query :", "err:", err)
-				return nil, mpccode.CodeParamInvalid("invalid from address")
-			}
-			req.From = addr.Hex()
-		}
-		if req.To != "" {
-			addr, err := address.Base58ToAddress(req.To)
-			if err != nil {
-				g.Log().Error(ctx, "Query :", "err:", err)
-				return nil, mpccode.CodeParamInvalid("invalid To address")
-			}
-			req.To = addr.String()
-		}
-		if req.Contract != "" {
-			addr, err := address.Base58ToAddress(req.Contract)
-			if err != nil {
-				g.Log().Error(ctx, "Query :", "err:", err)
-				return nil, mpccode.CodeParamInvalid("invalid Contract address")
-			}
-			req.Contract = addr.String()
-		}
-		g.Log().Debug(ctx, "Tron Query :", "req:", req)
+	req.From, err = wrapInputAddr(req.ChainId, req.From)
+	if err != nil {
+		g.Log().Error(ctx, "wrapInputAddr err:", err)
+		return nil, mpccode.CodeParamInvalid("from addr invalid")
 	}
+	req.To, err = wrapInputAddr(req.ChainId, req.To)
+	if err != nil {
+		g.Log().Error(ctx, "wrapInputAddr err:", err)
+		return nil, mpccode.CodeParamInvalid("to addr invalid")
+	}
+	req.Contract, err = wrapInputAddr(req.ChainId, req.Contract)
+	if err != nil {
+		g.Log().Error(ctx, "wrapInputAddr err:", err)
+		return nil, mpccode.CodeParamInvalid("contract addr invalid")
+	}
+	////
+
 	/////
 	reqchain := service.RiskAdmin().RiskAdminCfg().GetChain(req.ChainId)
 	if reqchain == nil || reqchain.IsEnable == 0 {
@@ -138,9 +148,9 @@ func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.Que
 			BlockHash: r.BlockHash,
 			TxHash:    r.TxHash,
 			Ts:        r.Ts,
-			From:      r.From,
-			To:        r.To,
-			Contract:  r.Contract,
+			From:      wrapOutAddr(r.ChainId, r.From),
+			To:        wrapOutAddr(r.ChainId, r.To),
+			Contract:  wrapOutAddr(r.ChainId, r.Contract),
 			Kind:      r.Kind,
 			Status:    r.Status,
 			Symbol: func() string {

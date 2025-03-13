@@ -35,7 +35,7 @@ func wrapInputAddr(chainId int64, addr string) (string, error) {
 		if err != nil {
 			return addr, err
 		}
-		return baddr.Hex(), nil
+		return common.BytesToAddress(baddr.Bytes()).Hex(), nil
 	}
 	return addr, nil
 }
@@ -79,6 +79,7 @@ func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.Que
 	if req.Page < 0 || req.PageSize < 0 {
 		return nil, mpccode.CodeParamInvalid("page or pageSize invalid")
 	}
+	g.Log().Debug(ctx, "Query req:", req)
 	///
 	query := &mpcdao.QueryData{
 		ChainId: req.ChainId,

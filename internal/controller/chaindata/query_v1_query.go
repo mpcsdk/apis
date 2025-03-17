@@ -4,6 +4,7 @@ import (
 	v1 "apis/api/chaindata/v1"
 	"apis/internal/service"
 	"context"
+	"crypto/sha256"
 	"math"
 	"math/big"
 	"strings"
@@ -15,7 +16,29 @@ import (
 	"github.com/mpcsdk/mpcCommon/mpcconsts"
 	"github.com/mpcsdk/mpcCommon/mpcdao"
 	"github.com/mpcsdk/mpcCommon/mpcdao/model/entity"
+	"github.com/shengdoushi/base58"
 )
+
+var TronAlphabet = base58.NewAlphabet("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
+
+func EVMToTronAddress(evmAddr string) string {
+	evmAddr = strings.ToLower(evmAddr)
+	addr := strings.TrimPrefix(evmAddr, "0x")
+
+	// 2. 添加 0x41 前缀
+	addr = "41" + addr
+	addrBytes := common.Hex2Bytes(addr)
+	// 3. 计算双重 SHA256 哈希
+	hash1 := sha256.Sum256(addrBytes)
+	hash2 := sha256.Sum256(hash1[:])
+	checksum := hash2[0:4]
+
+	addchecksum := append(addrBytes, checksum...)
+
+	// 10. Base58 编码
+	tronAddr := base58.Encode(addchecksum, TronAlphabet)
+	return tronAddr
+}
 
 func wrapOutTxHash(chainId int64, hash string) string {
 	switch chainId {
@@ -27,8 +50,8 @@ func wrapOutTxHash(chainId int64, hash string) string {
 func wrapOutAddr(chainId int64, addr string) string {
 	switch chainId {
 	case mpcconsts.Tron, mpcconsts.TronShasta, mpcconsts.TronNile:
-		addr := address.HexToAddress(addr)
-		return addr.String()
+		taddr := EVMToTronAddress(addr)
+		return taddr
 	}
 	return addr
 }
@@ -43,7 +66,7 @@ func wrapInputAddr(chainId int64, addr string) (string, error) {
 		if err != nil {
 			return addr, err
 		}
-		return baddr.Hex(), nil
+		return common.BytesToAddress(baddr.Bytes()).Hex(), nil
 	}
 	return addr, nil
 }
@@ -87,6 +110,7 @@ func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.Que
 	if req.Page < 0 || req.PageSize < 0 {
 		return nil, mpccode.CodeParamInvalid("page or pageSize invalid")
 	}
+	g.Log().Debug(ctx, "Query req:", req)
 	///
 	query := &mpcdao.QueryData{
 		ChainId: req.ChainId,

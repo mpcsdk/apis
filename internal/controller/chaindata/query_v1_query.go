@@ -21,7 +21,6 @@ import (
 
 var TronAlphabet = base58.NewAlphabet("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
 
-// var base58Alphabets =          []byte("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
 
 func EVMToTronAddress(evmAddr string) string {
 	evmAddr = strings.ToLower(evmAddr)
@@ -42,6 +41,13 @@ func EVMToTronAddress(evmAddr string) string {
 	return tronAddr
 }
 
+func wrapOutTxHash(chainId int64, hash string) string {
+	switch chainId {
+	case mpcconsts.Tron, mpcconsts.TronShasta, mpcconsts.TronNile:
+		return strings.TrimPrefix(hash, "0x")
+	}
+	return hash
+}
 func wrapOutAddr(chainId int64, addr string) string {
 	switch chainId {
 	case mpcconsts.Tron, mpcconsts.TronShasta, mpcconsts.TronNile:
@@ -173,7 +179,7 @@ func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.Que
 		res.Result = append(res.Result, &v1.QueryResult{
 			ChainId:   r.ChainId,
 			BlockHash: r.BlockHash,
-			TxHash:    r.TxHash,
+			TxHash:    wrapOutTxHash(r.ChainId, r.TxHash),
 			Ts:        r.Ts,
 			From:      wrapOutAddr(r.ChainId, r.From),
 			To:        wrapOutAddr(r.ChainId, r.To),

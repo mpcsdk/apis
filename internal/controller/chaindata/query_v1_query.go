@@ -4,8 +4,10 @@ import (
 	v1 "apis/api/chaindata/v1"
 	"apis/internal/service"
 	"context"
+	"crypto/sha256"
 	"math"
 	"math/big"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/fbsobreira/gotron-sdk/pkg/address"
@@ -14,13 +16,37 @@ import (
 	"github.com/mpcsdk/mpcCommon/mpcconsts"
 	"github.com/mpcsdk/mpcCommon/mpcdao"
 	"github.com/mpcsdk/mpcCommon/mpcdao/model/entity"
+	"github.com/shengdoushi/base58"
 )
+
+var TronAlphabet = base58.NewAlphabet("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
+
+// var base58Alphabets =          []byte("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
+
+func EVMToTronAddress(evmAddr string) string {
+	evmAddr = strings.ToLower(evmAddr)
+	addr := strings.TrimPrefix(evmAddr, "0x")
+
+	// 2. 添加 0x41 前缀
+	addr = "41" + addr
+	addrBytes := common.Hex2Bytes(addr)
+	// 3. 计算双重 SHA256 哈希
+	hash1 := sha256.Sum256(addrBytes)
+	hash2 := sha256.Sum256(hash1[:])
+	checksum := hash2[0:4]
+
+	addchecksum := append(addrBytes, checksum...)
+
+	// 10. Base58 编码
+	tronAddr := base58.Encode(addchecksum, TronAlphabet)
+	return tronAddr
+}
 
 func wrapOutAddr(chainId int64, addr string) string {
 	switch chainId {
 	case mpcconsts.Tron, mpcconsts.TronShasta, mpcconsts.TronNile:
-		addr := address.HexToAddress(addr)
-		return addr.String()
+		taddr := EVMToTronAddress(addr)
+		return taddr
 	}
 	return addr
 }
@@ -170,7 +196,12 @@ func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.Que
 				if r.Kind == "external" {
 					fbalance := big.NewFloat(0)
 					fbalance.SetString(r.Value)
-					fval := fbalance.Quo(fbalance, big.NewFloat(math.Pow10(18)))
+					decimal := 18
+					switch r.ChainId {
+					case mpcconsts.Tron, mpcconsts.TronShasta, mpcconsts.TronNile:
+						decimal = 6
+					}
+					fval := fbalance.Quo(fbalance, big.NewFloat(math.Pow10(decimal)))
 					s := fval.Text('f', -1)
 					return s
 				} else if r.Kind == "erc20" {

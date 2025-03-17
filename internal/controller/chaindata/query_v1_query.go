@@ -177,7 +177,14 @@ func (c *ControllerV1) Query(ctx context.Context, req *v1.QueryReq) (res *v1.Que
 				if r.Kind == "external" {
 					fbalance := big.NewFloat(0)
 					fbalance.SetString(r.Value)
-					fval := fbalance.Quo(fbalance, big.NewFloat(math.Pow10(18)))
+					chainCfg := service.RiskAdmin().RiskAdminCfg().GetChain(r.ChainId)
+					decimal := 18
+					if chainCfg == nil {
+						g.Log().Warning(ctx, "chainCfg not found:", r.ChainId)
+					} else {
+						decimal = chainCfg.Decimal
+					}
+					fval := fbalance.Quo(fbalance, big.NewFloat(math.Pow10(decimal)))
 					s := fval.Text('f', -1)
 					return s
 				} else if r.Kind == "erc20" {

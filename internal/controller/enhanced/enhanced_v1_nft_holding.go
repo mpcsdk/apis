@@ -34,6 +34,9 @@ func (s *ControllerV1) nftHoldingCollectionName(ctx context.Context, req *v1.Nft
 		}
 	}
 	g.Log().Debug(ctx, "NftHolding match collections:", contractAddrs)
+	if len(contractAddrs) == 0 {
+		return nil, mpccode.CodeParamInvalid("conllectionName")
+	}
 	//////
 	rst, err := s.nftHolding.Query(ctx, &mpcdao.QueryNftHolding{
 		ChainId:   req.ChainId,
